@@ -1,89 +1,93 @@
-# Stage 5
+# Stage 6
 
-# Scalable Notification Delivery System
+# Priority Inbox Algorithm
 
-Sending notifications one by one can become slow when the number of users increases.
+The notification system should display important notifications first.
 
-Example problem:
+Priority order:
 
-- delays in notification delivery
-- server overload
-- reduced performance
-
-To solve this, asynchronous processing and message queues can be used.
+1. Placement Notifications
+2. Result Notifications
+3. Event Notifications
 
 ---
 
-# Message Queue Architecture
+# Data Structure Used
 
-The system can use:
-
-- RabbitMQ
-- Kafka
-- AWS SQS
-
-These queues help process notifications asynchronously.
+A Priority Queue (Max Heap) can be used to manage notification priority efficiently.
 
 ---
 
-# Working Flow
+# Priority Values
+
+| Notification Type | Priority |
+|---|---|
+| Placement | 3 |
+| Result | 2 |
+| Event | 1 |
+
+---
+
+# Working
+
+When a new notification arrives:
+
+- priority value is assigned
+- higher priority notifications appear first
+- lower priority notifications appear later
+
+---
+
+# Advantages of Priority Queue
+
+- efficient sorting
+- faster retrieval of important notifications
+- scalable for large notification systems
+
+---
+
+# Time Complexity
+
+| Operation | Complexity |
+|---|---|
+| Insert Notification | O(log n) |
+| Remove Highest Priority | O(log n) |
+| Access Highest Priority | O(1) |
+
+---
+
+# Example Logic
 
 ```text
-Admin/User
-   ↓
-Notification Service
-   ↓
-Message Queue
-   ↓
-Worker Processes
-   ↓
-Database + Email + Push Notifications
+Placement > Result > Event
+```
+
+Example:
+
+```text
+Placement Drive Notification
+```
+
+will appear before:
+
+```text
+College Event Notification
 ```
 
 ---
 
-# Advantages
+# Scalability Improvements
 
-- faster processing
-- better scalability
-- fault tolerance
-- retry mechanism support
-- reduced server load
+The priority system can be combined with:
 
----
+- Redis caching
+- asynchronous workers
+- message queues
 
-# Worker Processing
-
-Worker services consume notification tasks from the queue and process them separately.
-
-Example tasks:
-
-- save notification
-- send email
-- push real-time notification
-
----
-
-# Async Processing Benefits
-
-- non-blocking operations
-- improved API response time
-- better system performance
-
----
-
-# Real-Time Notifications
-
-WebSockets or Socket.IO can be used to send instant notifications to users.
-
-Benefits:
-
-- live updates
-- improved user experience
-- reduced polling requests
+for handling large-scale notification traffic efficiently.
 
 ---
 
 # Conclusion
 
-Using message queues, workers, and asynchronous processing improves the scalability and reliability of the notification system.
+Using a priority queue helps the notification system display important notifications first and improves user experience.

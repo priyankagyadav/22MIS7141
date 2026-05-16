@@ -1,96 +1,89 @@
-# Stage 4
+# Stage 5
 
-# Performance Improvement
+# Scalable Notification Delivery System
 
-As the number of users increases, notification performance may reduce because of high database traffic.
+Sending notifications one by one can become slow when the number of users increases.
 
-To improve scalability and response time, the following techniques can be used.
+Example problem:
 
----
+- delays in notification delivery
+- server overload
+- reduced performance
 
-# 1. Redis Caching
-
-Redis can store frequently accessed notification data temporarily.
-
-Examples:
-
-- unread notification count
-- latest notifications
-- recent user activity
-
-Benefits:
-
-- reduced database queries
-- faster API responses
-- improved performance
+To solve this, asynchronous processing and message queues can be used.
 
 ---
 
-# 2. Pagination
+# Message Queue Architecture
 
-Pagination prevents loading all notifications at once.
+The system can use:
 
-Example:
+- RabbitMQ
+- Kafka
+- AWS SQS
 
-```sql
-SELECT * FROM notifications
-LIMIT 10 OFFSET 0;
+These queues help process notifications asynchronously.
+
+---
+
+# Working Flow
+
+```text
+Admin/User
+   ↓
+Notification Service
+   ↓
+Message Queue
+   ↓
+Worker Processes
+   ↓
+Database + Email + Push Notifications
 ```
 
-Advantages:
+---
 
+# Advantages
+
+- faster processing
+- better scalability
+- fault tolerance
+- retry mechanism support
 - reduced server load
-- faster loading
-- better user experience
 
 ---
 
-# 3. Lazy Loading
+# Worker Processing
 
-Older notifications should load only when required.
+Worker services consume notification tasks from the queue and process them separately.
+
+Example tasks:
+
+- save notification
+- send email
+- push real-time notification
+
+---
+
+# Async Processing Benefits
+
+- non-blocking operations
+- improved API response time
+- better system performance
+
+---
+
+# Real-Time Notifications
+
+WebSockets or Socket.IO can be used to send instant notifications to users.
 
 Benefits:
 
-- reduced initial loading time
-- optimized frontend performance
-
----
-
-# 4. Database Indexing
-
-Indexes improve searching and sorting performance.
-
-Example:
-
-```sql
-CREATE INDEX idx_createdAt
-ON notifications(createdAt);
-```
-
----
-
-# 5. Read Replicas
-
-Read replica databases can handle heavy read traffic separately from the main database.
-
-Benefits:
-
-- improved scalability
-- reduced load on primary database
-
----
-
-# 6. Real-Time Notification System
-
-WebSockets or Socket.IO can send instant notifications without repeated polling.
-
-Benefits:
-
-- real-time updates
-- reduced unnecessary API calls
+- live updates
+- improved user experience
+- reduced polling requests
 
 ---
 
 # Conclusion
 
-Caching, pagination, indexing, and real-time communication help improve the scalability and performance of the notification system.
+Using message queues, workers, and asynchronous processing improves the scalability and reliability of the notification system.

@@ -1,125 +1,106 @@
-# Stage 1
+# Stage 3
 
-## Campus Notifications Microservice
+# Query Optimization
 
-This notification system supports:
+When notification records become very large, database queries may become slow.
 
-- Placements
-- Events
-- Results
+Example query:
 
-The system provides REST APIs for managing notifications.
-
----
-
-# REST API DESIGN
-
-## 1. Get All Notifications
-
-### Endpoint
-
-GET /notifications
-
-### Response
-
-```json
-{
-  "success": true,
-  "message": "Notifications fetched successfully"
-}
+```sql
+SELECT * FROM notifications
+WHERE isRead = FALSE
+ORDER BY createdAt DESC;
 ```
 
+Problems:
+
+- full table scan
+- slower sorting
+- increased response time
+
 ---
 
-## 2. Create Notification
+# Optimization Techniques
 
-### Endpoint
+## 1. Indexing
 
-POST /notifications
+Indexes improve searching speed.
 
-### Request Body
-
-```json
-{
-  "title": "Placement Drive",
-  "message": "TCS Hiring Started"
-}
+```sql
+CREATE INDEX idx_notifications
+ON notifications(isRead, createdAt);
 ```
 
-### Response
+Benefits:
 
-```json
-{
-  "success": true,
-  "message": "Notification created successfully"
-}
+- faster filtering
+- improved sorting
+- reduced query execution time
+
+---
+
+## 2. Pagination
+
+Instead of loading all records, limited records should be fetched.
+
+```sql
+SELECT * FROM notifications
+LIMIT 10 OFFSET 0;
 ```
 
+Advantages:
+
+- faster loading
+- reduced memory usage
+- better performance
+
 ---
 
-## 3. Mark Notification as Read
+## 3. Selecting Required Columns
 
-### Endpoint
+Avoid:
 
-PATCH /notifications/:id/read
-
-### Response
-
-```json
-{
-  "success": true,
-  "message": "Notification marked as read"
-}
+```sql
+SELECT *
 ```
 
----
+Use:
 
-## 4. Delete Notification
-
-### Endpoint
-
-DELETE /notifications/:id
-
-### Response
-
-```json
-{
-  "success": true,
-  "message": "Notification deleted successfully"
-}
+```sql
+SELECT id, title, message
+FROM notifications;
 ```
 
+This reduces unnecessary data transfer.
+
 ---
 
-# Headers
+## 4. Filtering
 
-```json
-{
-  "Content-Type": "application/json"
-}
+```sql
+SELECT * FROM notifications
+WHERE type = 'Placement';
 ```
 
----
-
-# Real-Time Notification Mechanism
-
-The system can use:
-
-- WebSockets
-- Socket.IO
-- Push Notifications
-
-This helps users receive instant notifications without refreshing the application.
+Filtering reduces unwanted records and improves efficiency.
 
 ---
 
-# Logging Middleware
+## 5. Redis Caching
 
-A logging middleware is integrated in the backend application to track:
+Redis can store:
 
-- API requests
-- API responses
-- Errors
-- Route access logs
+- unread notifications
+- latest notifications
+- frequently accessed data
 
-This helps in monitoring and debugging.
+Benefits:
+
+- reduced database load
+- faster response time
+
+---
+
+# Conclusion
+
+Using indexing, pagination, filtering, and Redis caching improves database performance and helps the notification system handle large-scale data efficiently.

@@ -1,47 +1,36 @@
-# Stage 3
+# Stage 4
 
-# Query Optimization
+# Performance Improvement
 
-When notification records become very large, database queries may become slow.
+As the number of users increases, notification performance may reduce because of high database traffic.
 
-Example query:
-
-```sql
-SELECT * FROM notifications
-WHERE isRead = FALSE
-ORDER BY createdAt DESC;
-```
-
-Problems:
-
-- full table scan
-- slower sorting
-- increased response time
+To improve scalability and response time, the following techniques can be used.
 
 ---
 
-# Optimization Techniques
+# 1. Redis Caching
 
-## 1. Indexing
+Redis can store frequently accessed notification data temporarily.
 
-Indexes improve searching speed.
+Examples:
 
-```sql
-CREATE INDEX idx_notifications
-ON notifications(isRead, createdAt);
-```
+- unread notification count
+- latest notifications
+- recent user activity
 
 Benefits:
 
-- faster filtering
-- improved sorting
-- reduced query execution time
+- reduced database queries
+- faster API responses
+- improved performance
 
 ---
 
-## 2. Pagination
+# 2. Pagination
 
-Instead of loading all records, limited records should be fetched.
+Pagination prevents loading all notifications at once.
+
+Example:
 
 ```sql
 SELECT * FROM notifications
@@ -50,57 +39,58 @@ LIMIT 10 OFFSET 0;
 
 Advantages:
 
+- reduced server load
 - faster loading
-- reduced memory usage
-- better performance
+- better user experience
 
 ---
 
-## 3. Selecting Required Columns
+# 3. Lazy Loading
 
-Avoid:
-
-```sql
-SELECT *
-```
-
-Use:
-
-```sql
-SELECT id, title, message
-FROM notifications;
-```
-
-This reduces unnecessary data transfer.
-
----
-
-## 4. Filtering
-
-```sql
-SELECT * FROM notifications
-WHERE type = 'Placement';
-```
-
-Filtering reduces unwanted records and improves efficiency.
-
----
-
-## 5. Redis Caching
-
-Redis can store:
-
-- unread notifications
-- latest notifications
-- frequently accessed data
+Older notifications should load only when required.
 
 Benefits:
 
-- reduced database load
-- faster response time
+- reduced initial loading time
+- optimized frontend performance
+
+---
+
+# 4. Database Indexing
+
+Indexes improve searching and sorting performance.
+
+Example:
+
+```sql
+CREATE INDEX idx_createdAt
+ON notifications(createdAt);
+```
+
+---
+
+# 5. Read Replicas
+
+Read replica databases can handle heavy read traffic separately from the main database.
+
+Benefits:
+
+- improved scalability
+- reduced load on primary database
+
+---
+
+# 6. Real-Time Notification System
+
+WebSockets or Socket.IO can send instant notifications without repeated polling.
+
+Benefits:
+
+- real-time updates
+- reduced unnecessary API calls
 
 ---
 
 # Conclusion
 
-Using indexing, pagination, filtering, and Redis caching improves database performance and helps the notification system handle large-scale data efficiently.
+Caching, pagination, indexing, and real-time communication help improve the scalability and performance of the notification system.
